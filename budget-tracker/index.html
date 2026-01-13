@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget Tracker</title>
+
+  <!-- IMPORTANT: this must match your folder: css/styles.css -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <div class="container">
+    <h1>Budget Tracker</h1>
+
+    <p class="toggle-text">
+      <span id="toggleText">Don't have an account?</span>
+      <button id="toggleBtn" class="link-btn" type="button">Sign Up</button>
+    </p>
+
+    <div id="formCard" class="form-card fade-in">
+      <h2 id="formTitle">Log In</h2>
+
+      <form id="authForm">
+        <div class="input-wrap">
+        <span class="icon">📧</span>
+        <input id="email" type="email" placeholder="Email" required />
+     </div>
+
+<div class="input-wrap">
+  <span class="icon">🔐</span>
+  <input id="password" type="password" placeholder="Password" required />
+</div>
+
+<div id="confirmWrap" class="input-wrap hidden">
+  <span class="icon">🔐</span>
+  <input id="confirmPassword" type="password" placeholder="Confirm Password" />
+</div>
+
+        <button id="submitBtn" type="submit">Login</button>
+      </form>
+
+      <p id="message"></p>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>
+
