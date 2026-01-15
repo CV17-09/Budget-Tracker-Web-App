@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget Tracker - Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <div class="container dashboard">
+    <div class="topbar">
+      <h1 class="app-title">Dashboard</h1>
+      <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="cards">
+      <div class="card">
+        <div class="card-label">Income</div>
+        <div id="incomeTotal" class="card-value">$0.00</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Expenses</div>
+        <div id="expenseTotal" class="card-value">$0.00</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Balance</div>
+        <div id="balanceTotal" class="card-value">$0.00</div>
+      </div>
+    </div>
+
+    <!-- Add Transaction -->
+    <h2 class="section-title">Add Transaction</h2>
+    <form id="txForm">
+      <div class="row">
+        <label class="field">
+          <span>Type</span>
+          <select id="txType" required>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Amount</span>
+          <input id="txAmount" type="number" step="0.01" min="0.01" placeholder="0.00" required />
+        </label>
+      </div>
+
+      <div class="row">
+        <label class="field">
+          <span>Category</span>
+          <input id="txCategory" type="text" placeholder="e.g., Rent, Food, Salary" required />
+        </label>
+
+        <label class="field">
+          <span>Date</span>
+          <input id="txDate" type="date" required />
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Note (optional)</span>
+        <input id="txNote" type="text" placeholder="Add a note…" />
+      </label>
+
+      <button type="submit">Add</button>
+      <p id="dashMessage"></p>
+    </form>
+
+    <!-- Transactions -->
+    <h2 class="section-title">Transactions</h2>
+    <div id="txEmpty" class="empty">No transactions yet. Add your first one above.</div>
+
+    <div class="tx-list" id="txList"></div>
+  </div>
+
+  <!-- Keep auth.js for route guard + logout -->
+  <script src="js/auth.js"></script>
+
+  <!-- New files -->
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+
+
