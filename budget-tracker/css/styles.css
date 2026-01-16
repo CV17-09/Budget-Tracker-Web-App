@@ -1,0 +1,98 @@
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1f6f5b, #2ecc71);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Card */
+.container {
+  background: #ffffff;
+  width: 360px;
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+/* Titles */
+h1 {
+  text-align: center;
+  color: #1f6f5b;
+  margin-bottom: 6px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+/* Toggle */
+.toggle-text {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.link-btn {
+  border: none;
+  background: none;
+  color: #2ecc71;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Inputs */
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f0fdf4;
+  border: 1px solid #c7ead6;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.input-wrap input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+}
+
+/* Button */
+button[type="submit"] {
+  width: 100%;
+  background: #1f6f5b;
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background: #185a4a;
+}
+
+/* Message */
+#message {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+/* Hide */
+.hidden {
+  display: none;
+}
