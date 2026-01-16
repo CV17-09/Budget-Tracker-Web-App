@@ -1,0 +1,20 @@
+/* ===============================
+   GLOBAL / BASE
+   =============================== */
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: #1f2937;
+}
+
+/* ===============================
+   UTILITIES
+   =============================== */
+.hidden {
+  display: none;
+}
