@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget Tracker Dashboard</title>
+
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">BT</div>
+        <div>
+          <div class="brand-name">Budget</div>
+          <div class="brand-sub">Tracker</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">MENU</div>
+      <nav class="nav">
+        <a class="nav-item active" href="#" id="navDashboard" aria-current="page">
+          <span class="nav-ico">🏠</span> Dashboard
+        </a>
+        <a class="nav-item" href="#" id="navTransactions">
+          <span class="nav-ico">🧾</span> Transactions
+        </a>
+        <a class="nav-item" href="#" id="navAnalytics">
+          <span class="nav-ico">📊</span> Analytics
+        </a>
+        <a class="nav-item" href="#" id="navHistory">
+          <span class="nav-ico">🕘</span> History
+        </a>
+      </nav>
+
+      <div class="sidebar-section">GENERAL</div>
+      <nav class="nav">
+        <a class="nav-item" href="#"><span class="nav-ico">⚙️</span> Settings</a>
+        <a class="nav-item" href="#"><span class="nav-ico">❓</span> Help</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logoutBtn">Log out</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="greeting">
+          <h1 id="welcomeText">Welcome 👋</h1>
+          <p class="muted">Here’s your money overview for this month.</p>
+        </div>
+
+        <div class="top-actions">
+          <div class="search">
+            <span class="search-ico">🔎</span>
+            <input id="searchInput" type="text" placeholder="Search anything" />
+          </div>
+
+          <button class="icon-btn" type="button" aria-label="Notifications">🔔</button>
+
+          <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle dark mode">🌓</button>
+
+          <div class="avatar" id="avatar">?</div>
+        </div>
+      </header>
+
+      <!-- ========================= -->
+      <!-- PAGE: DASHBOARD -->
+      <!-- ========================= -->
+      <section id="pageDashboard">
+        <section class="dashboard-layout">
+
+          <section class="stats">
+            <div class="stat-card accent-purple">
+              <div class="stat-top">
+                <span class="stat-title">Total Income</span>
+                <span class="pill up">+35%</span>
+              </div>
+              <div class="stat-value" id="incomeTotal">$0</div>
+              <div class="stat-foot muted">Calculated from your transactions</div>
+            </div>
+
+            <div class="stat-card accent-orange">
+              <div class="stat-top">
+                <span class="stat-title">Total Spending</span>
+                <span class="pill up">+7%</span>
+              </div>
+              <div class="stat-value" id="expenseTotal">$0</div>
+              <div class="stat-foot muted">Calculated from your transactions</div>
+            </div>
+
+            <div class="stat-card accent-blue">
+              <div class="stat-top">
+                <span class="stat-title">Net (Income - Expense)</span>
+                <span class="pill up">+15%</span>
+              </div>
+              <div class="stat-value" id="netTotal">$0</div>
+              <div class="stat-foot muted">Your current net this period</div>
+            </div>
+
+            <div class="stat-card accent-green">
+              <div class="stat-top">
+                <span class="stat-title">Total Transactions</span>
+                <span class="pill up">+8%</span>
+              </div>
+              <div class="stat-value" id="txCount">0</div>
+              <div class="stat-foot muted">Count of transactions</div>
+            </div>
+          </section>
+
+          <section class="grid">
+
+            <section class="card span-2">
+              <div class="card-head">
+                <div>
+                  <h2>Your Assets</h2>
+                  <p class="muted">Income vs Expense over time</p>
+                </div>
+                <select class="select" id="rangeSelectDashboard">
+                  <option value="all">All</option>
+                  <option value="7">Last 7 days</option>
+                  <option value="30" selected>Last 30 days</option>
+                  <option value="90">Last 90 days</option>
+                </select>
+              </div>
+
+              <div class="chart-wrap">
+                <canvas id="lineChart"></canvas>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-head">
+                <div>
+                  <h2>Transaction View</h2>
+                  <p class="muted">Income vs Expense</p>
+                </div>
+              </div>
+
+              <div class="donut-wrap">
+                <canvas id="donutChart"></canvas>
+              </div>
+
+              <div class="legend">
+                <div><span class="dot income"></span> Income</div>
+                <div><span class="dot expense"></span> Expense</div>
+              </div>
+            </section>
+
+            <section class="card span-2">
+              <div class="card-head">
+                <div>
+                  <h2>Quick Add</h2>
+                  <p class="muted">Add a transaction quickly</p>
+                </div>
+              </div>
+
+              <form class="quick-form" id="quickForm">
+                <label>
+                  <span class="label">Type</span>
+                  <select id="type">
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span class="label">Amount</span>
+                  <input id="amount" type="number" step="0.01" min="0" placeholder="0.00" required />
+                </label>
+
+                <label>
+                  <span class="label">Category</span>
+                  <input id="category" type="text" placeholder="Rent, Food, Salary" required />
+                </label>
+
+                <label>
+                  <span class="label">Date</span>
+                  <input id="date" type="date" required />
+                </label>
+
+                <button class="primary" type="submit">Add Transaction</button>
+              </form>
+            </section>
+
+            <section class="card span-2">
+              <div class="card-head">
+                <div>
+                  <h2>Latest Transactions</h2>
+                  <p class="muted">Most recent items</p>
+                </div>
+                <button class="link-btn" type="button" id="seeAllBtn">See all</button>
+              </div>
+
+              <div class="table-wrap">
+                <table class="table" id="txTable">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th class="right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </section>
+
+          </section>
+        </section>
+      </section>
+
+      <!-- ========================= -->
+      <!-- PAGE: TRANSACTIONS -->
+      <!-- ========================= -->
+      <section id="pageTransactions" style="display:none;">
+        <section class="grid">
+          <section class="card span-2">
+            <div class="card-head">
+              <div>
+                <h2>Transactions</h2>
+                <p class="muted">All your transactions</p>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table" id="txTableAll">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th class="right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <!-- ========================= -->
+      <!-- PAGE: ANALYTICS -->
+      <!-- ========================= -->
+      <section id="pageAnalytics" style="display:none;">
+        <section class="grid">
+
+          <section class="card span-2">
+            <div class="card-head">
+              <div>
+                <h2>Analytics</h2>
+                <p class="muted">Breakdowns and trends from your transactions</p>
+              </div>
+
+              <select class="select" id="rangeSelectAnalytics">
+                <option value="all">All</option>
+                <option value="7">Last 7 days</option>
+                <option value="30" selected>Last 30 days</option>
+                <option value="90">Last 90 days</option>
+              </select>
+            </div>
+
+            <div class="chart-wrap" style="height:280px;">
+              <canvas id="barCategoryChart"></canvas>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Top Spending Categories</h2>
+                <p class="muted">Where your money goes</p>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table" id="topCatsTable">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th class="right">Spent</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Monthly Net Trend</h2>
+                <p class="muted">Income minus expenses by month</p>
+              </div>
+            </div>
+
+            <div class="chart-wrap" style="height:280px;">
+              <canvas id="monthlyNetChart"></canvas>
+            </div>
+          </section>
+
+        </section>
+      </section>
+
+      <!-- ========================= -->
+      <!-- PAGE: HISTORY (WORKING!)
+      <!-- ========================= -->
+      <section id="pageHistory" style="display:none;">
+        <section class="grid">
+
+          <!-- FILTERS -->
+          <section class="card span-2">
+            <div class="card-head">
+              <div>
+                <h2>History</h2>
+                <p class="muted">Filter transactions by date and type. Export anytime.</p>
+              </div>
+            </div>
+
+            <form class="quick-form" id="historyForm">
+              <label>
+                <span class="label">Type</span>
+                <select id="historyType">
+                  <option value="all" selected>All</option>
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
+                </select>
+              </label>
+
+              <label>
+                <span class="label">Start Date</span>
+                <input id="historyStart" type="date" />
+              </label>
+
+              <label>
+                <span class="label">End Date</span>
+                <input id="historyEnd" type="date" />
+              </label>
+
+              <button class="primary" type="submit">Apply Filters</button>
+              <button class="link-btn" type="button" id="historyClearBtn">Clear</button>
+              <button class="link-btn" type="button" id="exportCsvBtn">Export CSV</button>
+            </form>
+          </section>
+
+          <!-- RESULTS -->
+          <section class="card span-2">
+            <div class="card-head">
+              <div>
+                <h2>Results</h2>
+                <p class="muted" id="historyCount">0 transactions</p>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table" id="historyTable">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th class="right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+
+        </section>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // ====================
+    // WELCOME NAME + AVATAR
+    // ====================
+    const displayName = sessionStorage.getItem("displayName");
+    if (displayName) {
+      const pretty = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+      document.getElementById("welcomeText").textContent = `Welcome, ${pretty} 👋`;
+      const avatarEl = document.getElementById("avatar");
+      if (avatarEl) avatarEl.textContent = pretty.charAt(0).toUpperCase();
+    } else {
+      window.location.href = "index.html";
+    }
+
+    // LOGOUT
+    document.getElementById("logoutBtn")?.addEventListener("click", () => {
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    });
+
+    // ====================
+    // TRANSACTIONS (LOCAL STORAGE)
+    // ====================
+    const STORAGE_KEY = "bt_transactions";
+    const demo = [
+      { title: "Salary", date: "2026-01-10", type: "income", amount: 6000 },
+      { title: "Rent", date: "2026-01-16", type: "expense", amount: 2000 },
+      { title: "Groceries", date: "2026-01-18", type: "expense", amount: 180 },
+      { title: "Freelance", date: "2026-01-20", type: "income", amount: 900 },
+      { title: "Coffee", date: "2026-01-21", type: "expense", amount: 6.50 },
+      { title: "Gas", date: "2026-01-22", type: "expense", amount: 45.25 },
+    ];
+
+    let transactions = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!Array.isArray(transactions) || transactions.length === 0) {
+      transactions = demo;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+    }
+
+    function saveTransactions() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+    }
+
+    const fmt = (n) =>
+      new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+
+    function sortByDateAsc(list) {
+      return [...list].sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+    function sortByDateDesc(list) {
+      return [...list].sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function filterByLastDays(list, days) {
+      if (days === "all") return list;
+      const d = Number(days);
+      if (!Number.isFinite(d)) return list;
+      const now = new Date();
+      const start = new Date(now);
+      start.setDate(now.getDate() - d);
+      return list.filter(t => new Date(t.date) >= start);
+    }
+
+    function calcTotals(list) {
+      let income = 0, expense = 0;
+      for (const t of list) t.type === "income" ? (income += t.amount) : (expense += t.amount);
+      return { income, expense, net: income - expense, count: list.length };
+    }
+
+    // ====================
+    // DASHBOARD RENDERERS
+    // ====================
+    function renderStats(list) {
+      const { income, expense, net, count } = calcTotals(list);
+      document.getElementById("incomeTotal").textContent = fmt(income);
+      document.getElementById("expenseTotal").textContent = fmt(expense);
+      document.getElementById("netTotal").textContent = fmt(net);
+      document.getElementById("txCount").textContent = String(count);
+    }
+
+    function renderLatestTable(list) {
+      const tbody = document.querySelector("#txTable tbody");
+      tbody.innerHTML = "";
+      sortByDateDesc(list).slice(0, 6).forEach((t) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${t.title}</td>
+          <td>${t.date}</td>
+          <td><span class="tag ${t.type}">${t.type}</span></td>
+          <td class="right ${t.type === "income" ? "pos" : "neg"}">
+            ${t.type === "income" ? "+" : "-"}${fmt(t.amount)}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderAllTransactions(list) {
+      const tbody = document.querySelector("#txTableAll tbody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      sortByDateDesc(list).forEach((t) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${t.title}</td>
+          <td>${t.date}</td>
+          <td><span class="tag ${t.type}">${t.type}</span></td>
+          <td class="right ${t.type === "income" ? "pos" : "neg"}">
+            ${t.type === "income" ? "+" : "-"}${fmt(t.amount)}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    let lineChart, donutChart;
+
+    function renderDashboardCharts(list) {
+      const sorted = sortByDateAsc(list);
+      const dates = sorted.map((t) => t.date);
+      const incomeSeries = sorted.map((t) => (t.type === "income" ? t.amount : 0));
+      const expenseSeries = sorted.map((t) => (t.type === "expense" ? t.amount : 0));
+      const { income, expense } = calcTotals(list);
+
+      const isDark = document.body.classList.contains("dark");
+      const grid = isDark ? "rgba(255,255,255,0.12)" : "rgba(15,23,42,0.10)";
+      const ticks = isDark ? "#e5e7eb" : "#0f172a";
+
+      const lineCtx = document.getElementById("lineChart");
+      if (lineChart) lineChart.destroy();
+      lineChart = new Chart(lineCtx, {
+        type: "line",
+        data: {
+          labels: dates,
+          datasets: [
+            { label: "Income", data: incomeSeries, tension: 0.35 },
+            { label: "Expense", data: expenseSeries, tension: 0.35 },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: "top", labels: { color: ticks } } },
+          scales: {
+            x: { ticks: { color: ticks }, grid: { color: grid } },
+            y: { beginAtZero: true, ticks: { color: ticks }, grid: { color: grid } },
+          },
+        },
+      });
+
+      const donutCtx = document.getElementById("donutChart");
+      if (donutChart) donutChart.destroy();
+      donutChart = new Chart(donutCtx, {
+        type: "doughnut",
+        data: {
+          labels: ["Income", "Expense"],
+          datasets: [{ data: [income, expense] }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          cutout: "70%",
+        },
+      });
+    }
+
+    // ====================
+    // ANALYTICS
+    // ====================
+    let barCategoryChart, monthlyNetChart;
+
+    function groupExpenseByCategory(list) {
+      const map = new Map();
+      list.forEach(t => {
+        if (t.type !== "expense") return;
+        const key = (t.title || "Uncategorized").trim() || "Uncategorized";
+        map.set(key, (map.get(key) || 0) + Number(t.amount || 0));
+      });
+      return [...map.entries()].sort((a, b) => b[1] - a[1]);
+    }
+
+    function groupNetByMonth(list) {
+      const map = new Map();
+      list.forEach(t => {
+        const d = new Date(t.date);
+        if (isNaN(d)) return;
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        const amt = Number(t.amount || 0);
+        const delta = t.type === "income" ? amt : -amt;
+        map.set(key, (map.get(key) || 0) + delta);
+      });
+      return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+    }
+
+    function renderTopCategoriesTable(list) {
+      const tbody = document.querySelector("#topCatsTable tbody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      const grouped = groupExpenseByCategory(list).slice(0, 8);
+      if (grouped.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="2" class="muted">No expense transactions yet.</td>`;
+        tbody.appendChild(tr);
+        return;
+      }
+
+      grouped.forEach(([cat, spent]) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${cat}</td>
+          <td class="right neg">-${fmt(spent)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderAnalyticsCharts(list) {
+      const isDark = document.body.classList.contains("dark");
+      const grid = isDark ? "rgba(255,255,255,0.12)" : "rgba(15,23,42,0.10)";
+      const ticks = isDark ? "#e5e7eb" : "#0f172a";
+
+      const groupedCats = groupExpenseByCategory(list).slice(0, 10);
+      const catLabels = groupedCats.map(x => x[0]);
+      const catValues = groupedCats.map(x => x[1]);
+
+      const barCtx = document.getElementById("barCategoryChart");
+      if (barCategoryChart) barCategoryChart.destroy();
+      barCategoryChart = new Chart(barCtx, {
+        type: "bar",
+        data: {
+          labels: catLabels.length ? catLabels : ["No expenses yet"],
+          datasets: [{
+            label: "Spending by Category",
+            data: catValues.length ? catValues : [0],
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: ticks } } },
+          scales: {
+            x: { ticks: { color: ticks }, grid: { color: grid } },
+            y: { beginAtZero: true, ticks: { color: ticks }, grid: { color: grid } },
+          },
+        },
+      });
+
+      const monthNet = groupNetByMonth(list);
+      const monthLabels = monthNet.map(x => x[0]);
+      const monthValues = monthNet.map(x => x[1]);
+
+      const mCtx = document.getElementById("monthlyNetChart");
+      if (monthlyNetChart) monthlyNetChart.destroy();
+      monthlyNetChart = new Chart(mCtx, {
+        type: "line",
+        data: {
+          labels: monthLabels.length ? monthLabels : ["No data"],
+          datasets: [{
+            label: "Net by Month",
+            data: monthValues.length ? monthValues : [0],
+            tension: 0.35,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: ticks } } },
+          scales: {
+            x: { ticks: { color: ticks }, grid: { color: grid } },
+            y: { ticks: { color: ticks }, grid: { color: grid } },
+          },
+        },
+      });
+    }
+
+    // ====================
+    // HISTORY
+    // ====================
+    const historyForm = document.getElementById("historyForm");
+    const historyType = document.getElementById("historyType");
+    const historyStart = document.getElementById("historyStart");
+    const historyEnd = document.getElementById("historyEnd");
+    const historyClearBtn = document.getElementById("historyClearBtn");
+    const exportCsvBtn = document.getElementById("exportCsvBtn");
+
+    function applyHistoryFilters() {
+      const type = historyType.value;
+      const start = historyStart.value ? new Date(historyStart.value) : null;
+      const end = historyEnd.value ? new Date(historyEnd.value) : null;
+
+      let filtered = [...transactions];
+
+      if (type !== "all") filtered = filtered.filter(t => t.type === type);
+
+      if (start) filtered = filtered.filter(t => new Date(t.date) >= start);
+      if (end) {
+        const endPlus = new Date(end);
+        endPlus.setHours(23, 59, 59, 999);
+        filtered = filtered.filter(t => new Date(t.date) <= endPlus);
+      }
+
+      filtered = sortByDateDesc(filtered);
+      renderHistoryTable(filtered);
+      return filtered;
+    }
+
+    function renderHistoryTable(list) {
+      const tbody = document.querySelector("#historyTable tbody");
+      const countEl = document.getElementById("historyCount");
+      if (!tbody) return;
+
+      tbody.innerHTML = "";
+      if (countEl) countEl.textContent = `${list.length} transaction${list.length === 1 ? "" : "s"}`;
+
+      if (list.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="4" class="muted">No transactions match your filters.</td>`;
+        tbody.appendChild(tr);
+        return;
+      }
+
+      list.forEach(t => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${t.title}</td>
+          <td>${t.date}</td>
+          <td><span class="tag ${t.type}">${t.type}</span></td>
+          <td class="right ${t.type === "income" ? "pos" : "neg"}">
+            ${t.type === "income" ? "+" : "-"}${fmt(t.amount)}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportToCsv(list) {
+      const rows = [
+        ["Title", "Date", "Type", "Amount"],
+        ...list.map(t => [t.title, t.date, t.type, String(t.amount)])
+      ];
+
+      const csv = rows
+        .map(r => r.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "budget-history.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+    }
+
+    historyForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      applyHistoryFilters();
+    });
+
+    historyClearBtn?.addEventListener("click", () => {
+      historyType.value = "all";
+      historyStart.value = "";
+      historyEnd.value = "";
+      applyHistoryFilters();
+    });
+
+    exportCsvBtn?.addEventListener("click", () => {
+      const filtered = applyHistoryFilters();
+      exportToCsv(filtered);
+    });
+
+    // ====================
+    // PAGE SWITCHING
+    // ====================
+    const navDashboard = document.getElementById("navDashboard");
+    const navTransactions = document.getElementById("navTransactions");
+    const navAnalytics = document.getElementById("navAnalytics");
+    const navHistory = document.getElementById("navHistory");
+
+    const pageDashboard = document.getElementById("pageDashboard");
+    const pageTransactions = document.getElementById("pageTransactions");
+    const pageAnalytics = document.getElementById("pageAnalytics");
+    const pageHistory = document.getElementById("pageHistory");
+
+    function setActive(linkEl) {
+      document.querySelectorAll(".nav .nav-item").forEach(a => a.classList.remove("active"));
+      linkEl.classList.add("active");
+    }
+
+    function showPage(which) {
+      pageDashboard.style.display = "none";
+      pageTransactions.style.display = "none";
+      pageAnalytics.style.display = "none";
+      pageHistory.style.display = "none";
+
+      if (which === "dashboard") {
+        pageDashboard.style.display = "block";
+        setActive(navDashboard);
+        renderCurrentDashboard();
+      }
+      if (which === "transactions") {
+        pageTransactions.style.display = "block";
+        setActive(navTransactions);
+        renderAllTransactions(transactions);
+      }
+      if (which === "analytics") {
+        pageAnalytics.style.display = "block";
+        setActive(navAnalytics);
+        renderCurrentAnalytics();
+      }
+      if (which === "history") {
+        pageHistory.style.display = "block";
+        setActive(navHistory);
+        applyHistoryFilters(); // render history table
+      }
+    }
+
+    navDashboard.addEventListener("click", (e) => { e.preventDefault(); showPage("dashboard"); });
+    navTransactions.addEventListener("click", (e) => { e.preventDefault(); showPage("transactions"); });
+    navAnalytics.addEventListener("click", (e) => { e.preventDefault(); showPage("analytics"); });
+    navHistory.addEventListener("click", (e) => { e.preventDefault(); showPage("history"); });
+
+    document.getElementById("seeAllBtn")?.addEventListener("click", () => showPage("transactions"));
+
+    // ====================
+    // RANGE SELECTS (Dashboard / Analytics)
+    // ====================
+    const rangeSelectDashboard = document.getElementById("rangeSelectDashboard");
+    const rangeSelectAnalytics = document.getElementById("rangeSelectAnalytics");
+
+    function renderCurrentDashboard() {
+      const filtered = filterByLastDays(transactions, rangeSelectDashboard?.value || "30");
+      renderStats(filtered);
+      renderLatestTable(filtered);
+      renderDashboardCharts(filtered);
+    }
+
+    function renderCurrentAnalytics() {
+      const filtered = filterByLastDays(transactions, rangeSelectAnalytics?.value || "30");
+      renderTopCategoriesTable(filtered);
+      renderAnalyticsCharts(filtered);
+    }
+
+    rangeSelectDashboard?.addEventListener("change", renderCurrentDashboard);
+    rangeSelectAnalytics?.addEventListener("change", renderCurrentAnalytics);
+
+    // ====================
+    // QUICK ADD
+    // ====================
+    const quickForm = document.getElementById("quickForm");
+    const typeEl = document.getElementById("type");
+    const amountEl = document.getElementById("amount");
+    const categoryEl = document.getElementById("category");
+    const dateEl = document.getElementById("date");
+
+    quickForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const type = typeEl.value;
+      const amount = Number(amountEl.value);
+      const title = categoryEl.value.trim();
+      const date = dateEl.value;
+
+      if (!title) return alert("Please enter a Category/Title.");
+      if (!date) return alert("Please pick a Date.");
+      if (!Number.isFinite(amount) || amount <= 0) return alert("Please enter a valid Amount > 0.");
+
+      const newTx = { title, date, type, amount };
+      transactions.unshift(newTx);
+      saveTransactions();
+
+      if (pageDashboard.style.display !== "none") renderCurrentDashboard();
+      if (pageTransactions.style.display !== "none") renderAllTransactions(transactions);
+      if (pageAnalytics.style.display !== "none") renderCurrentAnalytics();
+      if (pageHistory.style.display !== "none") applyHistoryFilters();
+
+      amountEl.value = "";
+      categoryEl.value = "";
+    });
+
+    // ====================
+    // THEME TOGGLE
+    // ====================
+    const themeBtn = document.getElementById("themeToggle");
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") document.body.classList.add("dark");
+    themeBtn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌓";
+
+    themeBtn.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      const isDark = document.body.classList.contains("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      themeBtn.textContent = isDark ? "☀️" : "🌓";
+
+      // redraw charts for theme tick colors
+      if (pageDashboard.style.display !== "none") renderCurrentDashboard();
+      if (pageAnalytics.style.display !== "none") renderCurrentAnalytics();
+    });
+
+    // Initial
+    renderCurrentDashboard();
+    showPage("dashboard");
+  </script>
+</body>
+</html>
