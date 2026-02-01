@@ -1,0 +1,1134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget Tracker Dashboard</title>
+
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">BT</div>
+        <div>
+          <div class="brand-name">Budget</div>
+          <div class="brand-sub">Tracker</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">MENU</div>
+      <nav class="nav">
+        <a class="nav-item active" href="#" id="navDashboard" aria-current="page">
+          <span class="nav-ico">🏠</span> Dashboard
+        </a>
+        <a class="nav-item" href="#" id="navTransactions">
+          <span class="nav-ico">🧾</span> Transactions
+        </a>
+        <a class="nav-item" href="#" id="navAnalytics">
+          <span class="nav-ico">📊</span> Analytics
+        </a>
+        <a class="nav-item" href="#" id="navHistory">
+          <span class="nav-ico">🕘</span> History
+        </a>
+      </nav>
+
+      <div class="sidebar-section">GENERAL</div>
+      <nav class="nav">
+        <a class="nav-item" href="#" id="navSettings"><span class="nav-ico">⚙️</span> Settings</a>
+        <a class="nav-item" href="#" id="navHelp"><span class="nav-ico">❓</span> Help</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logoutBtn">Log out</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="greeting">
+          <h1 id="welcomeText">Welcome 👋</h1>
+          <p class="muted">Here’s your money overview for this month.</p>
+        </div>
+
+        <div class="top-actions">
+          <div class="search">
+            <span class="search-ico">🔎</span>
+            <input id="searchInput" type="text" placeholder="Search anything" />
+          </div>
+
+          <button class="icon-btn" type="button" aria-label="Notifications">🔔</button>
+          <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle dark mode">🌓</button>
+          <div class="avatar" id="avatar">?</div>
+        </div>
+      </header>
+
+      <!-- ========================= -->
+      <!-- PAGE: DASHBOARD -->
+      <!-- ========================= -->
+      <section id="pageDashboard">
+        <section class="dashboard-layout">
+
+          <section class="stats">
+            <div class="stat-card accent-purple">
+              <div class="stat-top">
+                <span class="stat-title">Total Income</span>
+                <span class="pill up">+35%</span>
+              </div>
+              <div class="stat-value" id="incomeTotal">$0</div>
+              <div class="stat-foot muted">Calculated from your transactions</div>
+            </div>
+
+            <div class="stat-card accent-orange">
+              <div class="stat-top">
+                <span class="stat-title">Total Spending</span>
+                <span class="pill up">+7%</span>
+              </div>
+              <div class="stat-value" id="expenseTotal">$0</div>
+              <div class="stat-foot muted">Calculated from your transactions</div>
+            </div>
+
+            <div class="stat-card accent-blue">
+              <div class="stat-top">
+                <span class="stat-title">Net (Income - Expense)</span>
+                <span class="pill up">+15%</span>
+              </div>
+              <div class="stat-value" id="netTotal">$0</div>
+              <div class="stat-foot muted">Your current net this period</div>
+            </div>
+
+            <div class="stat-card accent-green">
+              <div class="stat-top">
+                <span class="stat-title">Total Transactions</span>
+                <span class="pill up">+8%</span>
+              </div>
+              <div class="stat-value" id="txCount">0</div>
+              <div class="stat-foot muted">Count of transactions</div>
+            </div>
+          </section>
+
+          <section class="grid">
+
+            <section class="card span-2">
+              <div class="card-head">
+                <div>
+                  <h2>Your Assets</h2>
+                  <p class="muted">Income vs Expense over time</p>
+                </div>
+                <select class="select" id="rangeSelectDashboard">
+                  <option value="all">All</option>
+                  <option value="7">Last 7 days</option>
+                  <option value="30" selected>Last 30 days</option>
+                  <option value="90">Last 90 days</option>
+                </select>
+              </div>
+
+              <div class="chart-wrap">
+                <canvas id="lineChart"></canvas>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-head">
+                <div>
+                  <h2>Transaction View</h2>
+                  <p class="muted">Income vs Expense</p>
+                </div>
+              </div>
+
+              <div class="donut-wrap">
+                <canvas id="donutChart"></canvas>
+              </div>
+
+              <div class="legend">
+                <div><span class="dot income"></span> Income</div>
+                <div><span class="dot expense"></span> Expense</div>
+              </div>
+            </section>
+
+            <section class="card span-2">
+              <div class="card-head">
+                <div>
+                  <h2>Quick Add</h2>
+                  <p class="muted">Add a transaction quickly</p>
+                </div>
+              </div>
+
+              <form class="quick-form" id="quickForm">
+                <label>
+                  <span class="label">Type</span>
+                  <select id="type">
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span class="label">Amount</span>
+                  <input id="amount" type="number" step="0.01" min="0" placeholder="0.00" required />
+                </label>
+
+                <label>
+                  <span class="label">Category</span>
+                  <input id="category" type="text" placeholder="Rent, Food, Salary" required />
+                </label>
+
+                <label>
+                  <span class="label">Date</span>
+                  <input id="date" type="date" required />
+                </label>
+
+                <button class="primary" type="submit">Add Transaction</button>
+              </form>
+            </section>
+
+            <section class="card span-2">
+              <div class="card-head">
+                <div>
+                  <h2>Latest Transactions</h2>
+                  <p class="muted">Most recent items</p>
+                </div>
+                <button class="link-btn" type="button" id="seeAllBtn">See all</button>
+              </div>
+
+              <div class="table-wrap">
+                <table class="table" id="txTable">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th class="right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </section>
+
+          </section>
+        </section>
+      </section>
+
+      <!-- ========================= -->
+      <!-- PAGE: TRANSACTIONS -->
+      <!-- ========================= -->
+      <section id="pageTransactions" style="display:none;">
+        <section class="grid">
+          <section class="card span-2">
+            <div class="card-head">
+              <div>
+                <h2>Transactions</h2>
+                <p class="muted">All your transactions</p>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table" id="txTableAll">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th class="right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <!-- ========================= -->
+      <!-- PAGE: ANALYTICS -->
+      <!-- ========================= -->
+      <section id="pageAnalytics" style="display:none;">
+        <section class="grid">
+
+          <section class="card span-2">
+            <div class="card-head">
+              <div>
+                <h2>Analytics</h2>
+                <p class="muted">Breakdowns and trends from your transactions</p>
+              </div>
+
+              <select class="select" id="rangeSelectAnalytics">
+                <option value="all">All</option>
+                <option value="7">Last 7 days</option>
+                <option value="30" selected>Last 30 days</option>
+                <option value="90">Last 90 days</option>
+              </select>
+            </div>
+
+            <div class="chart-wrap" style="height:280px;">
+              <canvas id="barCategoryChart"></canvas>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Top Spending Categories</h2>
+                <p class="muted">Where your money goes</p>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table" id="topCatsTable">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th class="right">Spent</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Monthly Net Trend</h2>
+                <p class="muted">Income minus expenses by month</p>
+              </div>
+            </div>
+
+            <div class="chart-wrap" style="height:280px;">
+              <canvas id="monthlyNetChart"></canvas>
+            </div>
+          </section>
+
+        </section>
+      </section>
+
+      <!-- ========================= -->
+      <!-- PAGE: HISTORY -->
+      <!-- ========================= -->
+      <section id="pageHistory" style="display:none;">
+        <section class="grid">
+          <section class="card span-2">
+            <div class="card-head">
+              <div>
+                <h2>History</h2>
+                <p class="muted">Filters, exports, and more can go here later.</p>
+              </div>
+            </div>
+            <div class="muted" style="padding: 0 18px 18px;">
+              Add filters and export features here.
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <!-- ========================= -->
+      <!-- PAGE: SETTINGS -->
+      <!-- ========================= -->
+      <section id="pageSettings" style="display:none;">
+        <section class="grid">
+
+          <!-- APPEARANCE -->
+          <section class="card span-2">
+            <div class="card-head">
+              <div>
+                <h2>Settings</h2>
+                <p class="muted">Customize appearance, preferences, and data</p>
+              </div>
+            </div>
+
+            <div style="padding: 0 18px 18px;">
+              <h3 style="margin: 10px 0;">Appearance</h3>
+
+              <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+                <label style="display:flex; gap:10px; align-items:center;">
+                  <input type="checkbox" id="setDarkMode" />
+                  <span class="muted">Dark Mode</span>
+                </label>
+
+                <label style="display:flex; gap:10px; align-items:center;">
+                  <input type="checkbox" id="setSystemTheme" />
+                  <span class="muted">Use System Theme</span>
+                </label>
+              </div>
+
+              <hr style="opacity:.15; margin:16px 0;" />
+
+              <h3 style="margin: 10px 0;">Preferences</h3>
+
+              <div class="quick-form" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+                <label>
+                  <span class="label">Currency</span>
+                  <select id="setCurrency" class="select">
+                    <option value="USD" selected>USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                    <option value="VES">VES (Bs.)</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span class="label">Start of Week</span>
+                  <select id="setWeekStart" class="select">
+                    <option value="sunday" selected>Sunday</option>
+                    <option value="monday">Monday</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span class="label">Default Analytics Range</span>
+                  <select id="setDefaultRange" class="select">
+                    <option value="7">Last 7 days</option>
+                    <option value="30" selected>Last 30 days</option>
+                    <option value="90">Last 90 days</option>
+                    <option value="all">All</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span class="label">Monthly Spending Goal</span>
+                  <input id="setMonthlyGoal" type="number" step="0.01" min="0" placeholder="e.g. 2500" />
+                </label>
+              </div>
+
+              <div style="display:flex; gap:10px; margin-top: 14px; flex-wrap:wrap;">
+                <button class="primary" type="button" id="saveSettingsBtn">Save Settings</button>
+                <button class="link-btn" type="button" id="resetSettingsBtn">Reset Settings</button>
+              </div>
+
+              <p class="muted" id="settingsMsg" style="margin-top:10px;"></p>
+
+              <hr style="opacity:.15; margin:16px 0;" />
+
+              <h3 style="margin: 10px 0;">Data</h3>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="link-btn" type="button" id="exportJsonBtn">Export Data (JSON)</button>
+                <label class="link-btn" style="cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+                  Import Data (JSON)
+                  <input id="importJsonInput" type="file" accept="application/json" style="display:none;" />
+                </label>
+                <button class="link-btn" type="button" id="resetDataBtn">Reset All Data</button>
+              </div>
+
+              <p class="muted" style="margin-top:10px;">
+                Export/Import lets you back up your transactions. Reset will clear transactions + settings.
+              </p>
+            </div>
+          </section>
+
+        </section>
+      </section>
+
+      <!-- ========================= -->
+      <!-- PAGE: HELP -->
+      <!-- ========================= -->
+      <section id="pageHelp" style="display:none;">
+        <section class="grid">
+
+          <section class="card span-2">
+            <div class="card-head">
+              <div>
+                <h2>Help</h2>
+                <p class="muted">Quick answers, tips, and troubleshooting</p>
+              </div>
+            </div>
+
+            <div style="padding: 0 18px 18px;">
+              <h3 style="margin: 10px 0;">Getting Started</h3>
+              <ul style="margin: 0; padding-left: 18px;">
+                <li><b>Add a transaction:</b> Use <i>Quick Add</i> on Dashboard. Choose type, amount, category/title, and date.</li>
+                <li><b>See everything:</b> Click <i>Transactions</i> in the sidebar or “See all”.</li>
+                <li><b>Analytics:</b> Shows spending by category and monthly net trend (Income - Expenses).</li>
+                <li><b>Backup:</b> Go to <i>Settings → Data</i> and Export JSON.</li>
+              </ul>
+
+              <hr style="opacity:.15; margin:16px 0;" />
+
+              <h3 style="margin: 10px 0;">FAQ</h3>
+
+              <details style="margin-bottom:10px;">
+                <summary style="cursor:pointer;"><b>Why don’t my Analytics charts show anything?</b></summary>
+                <div class="muted" style="margin-top:8px;">
+                  Analytics charts depend on transactions in the selected range. If you have no expenses in the last 7/30 days,
+                  the category chart may show “No data”. Try switching range to “All” or add a few expense transactions.
+                </div>
+              </details>
+
+              <details style="margin-bottom:10px;">
+                <summary style="cursor:pointer;"><b>What does “Category” mean?</b></summary>
+                <div class="muted" style="margin-top:8px;">
+                  In this app, the Category field is saved as the transaction <b>title</b>. Examples: Rent, Groceries, Gas, Salary.
+                  Analytics groups <b>expenses</b> by this value.
+                </div>
+              </details>
+
+              <details style="margin-bottom:10px;">
+                <summary style="cursor:pointer;"><b>How does Dark Mode work?</b></summary>
+                <div class="muted" style="margin-top:8px;">
+                  You can toggle dark mode with the top-right button. In Settings, “Use System Theme” follows your OS theme and
+                  disables manual dark mode. If you want manual control, turn off “Use System Theme”.
+                </div>
+              </details>
+
+              <details style="margin-bottom:10px;">
+                <summary style="cursor:pointer;"><b>How do I move my data to another computer?</b></summary>
+                <div class="muted" style="margin-top:8px;">
+                  Export JSON in Settings, then on the new computer import the JSON file. It restores transactions, settings, and theme.
+                </div>
+              </details>
+
+              <hr style="opacity:.15; margin:16px 0;" />
+
+              <h3 style="margin: 10px 0;">Troubleshooting</h3>
+              <ul style="margin: 0; padding-left: 18px;">
+                <li><b>Nothing saves:</b> Make sure your browser allows LocalStorage (private mode can block it).</li>
+                <li><b>Charts look weird after theme change:</b> Toggle pages or switch range — charts refresh automatically when theme changes.</li>
+                <li><b>Reset everything:</b> Settings → Reset All Data (this clears all transactions).</li>
+              </ul>
+
+              <p class="muted" style="margin-top:14px;">
+                Tip: You can customize this Help page later with shortcuts, links, and a roadmap of features you want to add.
+              </p>
+            </div>
+          </section>
+
+        </section>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // ====================
+    // WELCOME NAME + AVATAR
+    // ====================
+    const displayName = sessionStorage.getItem("displayName");
+    if (displayName) {
+      const pretty = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+      document.getElementById("welcomeText").textContent = `Welcome, ${pretty} 👋`;
+      const avatarEl = document.getElementById("avatar");
+      if (avatarEl) avatarEl.textContent = pretty.charAt(0).toUpperCase();
+    } else {
+      window.location.href = "index.html";
+    }
+
+    // LOGOUT
+    document.getElementById("logoutBtn")?.addEventListener("click", () => {
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    });
+
+    // ====================
+    // STORAGE KEYS
+    // ====================
+    const STORAGE_TX = "bt_transactions";
+    const STORAGE_THEME = "theme";               // "light" | "dark"
+    const STORAGE_SETTINGS = "bt_settings";
+
+    // ====================
+    // TRANSACTIONS (LOCAL STORAGE)
+    // ====================
+    const demo = [
+      { title: "Salary", date: "2026-01-10", type: "income", amount: 6000 },
+      { title: "Rent", date: "2026-01-16", type: "expense", amount: 2000 },
+      { title: "Groceries", date: "2026-01-18", type: "expense", amount: 180 },
+      { title: "Freelance", date: "2026-01-20", type: "income", amount: 900 },
+    ];
+
+    let transactions = JSON.parse(localStorage.getItem(STORAGE_TX));
+    if (!Array.isArray(transactions) || transactions.length === 0) {
+      transactions = demo;
+      localStorage.setItem(STORAGE_TX, JSON.stringify(transactions));
+    }
+
+    function saveTransactions() {
+      localStorage.setItem(STORAGE_TX, JSON.stringify(transactions));
+    }
+
+    // ====================
+    // SETTINGS (LOCAL STORAGE)
+    // ====================
+    const defaultSettings = {
+      useSystemTheme: false,
+      currency: "USD",
+      weekStart: "sunday",
+      defaultRange: "30",
+      monthlyGoal: ""
+    };
+
+    let settings = JSON.parse(localStorage.getItem(STORAGE_SETTINGS));
+    if (!settings || typeof settings !== "object") settings = { ...defaultSettings };
+
+    // ====================
+    // FORMATTER (uses settings.currency)
+    // ====================
+    function fmt(n) {
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: settings.currency || "USD" }).format(n);
+    }
+
+    function sortByDateAsc(list) {
+      return [...list].sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+    function sortByDateDesc(list) {
+      return [...list].sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function filterByLastDays(list, days) {
+      if (days === "all") return list;
+      const d = Number(days);
+      if (!Number.isFinite(d)) return list;
+      const now = new Date();
+      const start = new Date(now);
+      start.setDate(now.getDate() - d);
+      return list.filter(t => new Date(t.date) >= start);
+    }
+
+    function calcTotals(list) {
+      let income = 0, expense = 0;
+      for (const t of list) t.type === "income" ? (income += t.amount) : (expense += t.amount);
+      return { income, expense, net: income - expense, count: list.length };
+    }
+
+    // ====================
+    // DASHBOARD RENDERERS
+    // ====================
+    function renderStats(list) {
+      const { income, expense, net, count } = calcTotals(list);
+      document.getElementById("incomeTotal").textContent = fmt(income);
+      document.getElementById("expenseTotal").textContent = fmt(expense);
+      document.getElementById("netTotal").textContent = fmt(net);
+      document.getElementById("txCount").textContent = String(count);
+    }
+
+    function renderLatestTable(list) {
+      const tbody = document.querySelector("#txTable tbody");
+      tbody.innerHTML = "";
+      sortByDateDesc(list).slice(0, 6).forEach((t) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${t.title}</td>
+          <td>${t.date}</td>
+          <td><span class="tag ${t.type}">${t.type}</span></td>
+          <td class="right ${t.type === "income" ? "pos" : "neg"}">
+            ${t.type === "income" ? "+" : "-"}${fmt(t.amount)}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderAllTransactions(list) {
+      const tbody = document.querySelector("#txTableAll tbody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      sortByDateDesc(list).forEach((t) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${t.title}</td>
+          <td>${t.date}</td>
+          <td><span class="tag ${t.type}">${t.type}</span></td>
+          <td class="right ${t.type === "income" ? "pos" : "neg"}">
+            ${t.type === "income" ? "+" : "-"}${fmt(t.amount)}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    let lineChart, donutChart;
+
+    function renderDashboardCharts(list) {
+      const sorted = sortByDateAsc(list);
+      const dates = sorted.map((t) => t.date);
+      const incomeSeries = sorted.map((t) => (t.type === "income" ? t.amount : 0));
+      const expenseSeries = sorted.map((t) => (t.type === "expense" ? t.amount : 0));
+      const { income, expense } = calcTotals(list);
+
+      const isDark = document.body.classList.contains("dark");
+      const grid = isDark ? "rgba(255,255,255,0.12)" : "rgba(15,23,42,0.10)";
+      const ticks = isDark ? "#e5e7eb" : "#0f172a";
+
+      const lineCtx = document.getElementById("lineChart");
+      if (lineChart) lineChart.destroy();
+      lineChart = new Chart(lineCtx, {
+        type: "line",
+        data: {
+          labels: dates,
+          datasets: [
+            { label: "Income", data: incomeSeries, tension: 0.35 },
+            { label: "Expense", data: expenseSeries, tension: 0.35 },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: "top", labels: { color: ticks } } },
+          scales: {
+            x: { ticks: { color: ticks }, grid: { color: grid } },
+            y: { beginAtZero: true, ticks: { color: ticks }, grid: { color: grid } },
+          },
+        },
+      });
+
+      const donutCtx = document.getElementById("donutChart");
+      if (donutChart) donutChart.destroy();
+      donutChart = new Chart(donutCtx, {
+        type: "doughnut",
+        data: {
+          labels: ["Income", "Expense"],
+          datasets: [{ data: [income, expense] }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          cutout: "70%",
+        },
+      });
+    }
+
+    // ====================
+    // ANALYTICS (NOW WORKING)
+    // ====================
+    const rangeSelectAnalytics = document.getElementById("rangeSelectAnalytics");
+    let barCategoryChart, monthlyNetChart;
+
+    function groupExpenseByCategory(list) {
+      const map = new Map();
+      for (const t of list) {
+        if (t.type !== "expense") continue;
+        const key = (t.title || "Other").trim() || "Other";
+        map.set(key, (map.get(key) || 0) + Number(t.amount || 0));
+      }
+      return [...map.entries()].sort((a, b) => b[1] - a[1]); // [category, totalSpent]
+    }
+
+    function groupMonthlyNet(list) {
+      const map = new Map(); // "YYYY-MM" -> net
+      for (const t of list) {
+        const d = new Date(t.date);
+        if (Number.isNaN(d.getTime())) continue;
+        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        const prev = map.get(ym) || 0;
+        const amt = Number(t.amount || 0);
+        const next = t.type === "income" ? prev + amt : prev - amt;
+        map.set(ym, next);
+      }
+      return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0])); // [ym, net] asc
+    }
+
+    function renderTopCatsTable(expensePairs) {
+      const tbody = document.querySelector("#topCatsTable tbody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      const top = expensePairs.slice(0, 8);
+      if (top.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td class="muted">No expense data</td><td class="right muted">—</td>`;
+        tbody.appendChild(tr);
+        return;
+      }
+
+      for (const [cat, total] of top) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${cat}</td>
+          <td class="right">${fmt(total)}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderAnalyticsCharts(list) {
+      const isDark = document.body.classList.contains("dark");
+      const grid = isDark ? "rgba(255,255,255,0.12)" : "rgba(15,23,42,0.10)";
+      const ticks = isDark ? "#e5e7eb" : "#0f172a";
+
+      // Bar: Spending by Category
+      const expensePairs = groupExpenseByCategory(list);
+      renderTopCatsTable(expensePairs);
+
+      const cats = expensePairs.map(x => x[0]);
+      const spent = expensePairs.map(x => x[1]);
+
+      const barCtx = document.getElementById("barCategoryChart");
+      if (barCategoryChart) barCategoryChart.destroy();
+      barCategoryChart = new Chart(barCtx, {
+        type: "bar",
+        data: {
+          labels: cats.length ? cats : ["No data"],
+          datasets: [{ label: "Spent", data: spent.length ? spent : [0] }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: ticks } } },
+          scales: {
+            x: { ticks: { color: ticks }, grid: { color: grid } },
+            y: { beginAtZero: true, ticks: { color: ticks }, grid: { color: grid } },
+          },
+        },
+      });
+
+      // Line: Monthly Net Trend
+      const monthlyPairs = groupMonthlyNet(list);
+      const months = monthlyPairs.map(x => x[0]);
+      const nets = monthlyPairs.map(x => x[1]);
+
+      const netCtx = document.getElementById("monthlyNetChart");
+      if (monthlyNetChart) monthlyNetChart.destroy();
+      monthlyNetChart = new Chart(netCtx, {
+        type: "line",
+        data: {
+          labels: months.length ? months : ["No data"],
+          datasets: [{ label: "Net", data: nets.length ? nets : [0], tension: 0.35 }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: ticks } } },
+          scales: {
+            x: { ticks: { color: ticks }, grid: { color: grid } },
+            y: { ticks: { color: ticks }, grid: { color: grid } },
+          },
+        },
+      });
+    }
+
+    function renderCurrentAnalytics() {
+      const range = rangeSelectAnalytics?.value || settings.defaultRange || "30";
+      const filtered = filterByLastDays(transactions, range);
+      renderAnalyticsCharts(filtered);
+    }
+
+    rangeSelectAnalytics?.addEventListener("change", () => {
+      if (pageAnalytics.style.display !== "none") renderCurrentAnalytics();
+    });
+
+    // ====================
+    // HISTORY PLACEHOLDER
+    // ====================
+    function applyHistoryFilters() {}
+
+    // ====================
+    // PAGE SWITCHING
+    // ====================
+    const navDashboard = document.getElementById("navDashboard");
+    const navTransactions = document.getElementById("navTransactions");
+    const navAnalytics = document.getElementById("navAnalytics");
+    const navHistory = document.getElementById("navHistory");
+    const navSettings = document.getElementById("navSettings");
+    const navHelp = document.getElementById("navHelp");
+
+    const pageDashboard = document.getElementById("pageDashboard");
+    const pageTransactions = document.getElementById("pageTransactions");
+    const pageAnalytics = document.getElementById("pageAnalytics");
+    const pageHistory = document.getElementById("pageHistory");
+    const pageSettings = document.getElementById("pageSettings");
+    const pageHelp = document.getElementById("pageHelp");
+
+    function setActive(linkEl) {
+      document.querySelectorAll(".nav .nav-item").forEach(a => a.classList.remove("active"));
+      linkEl.classList.add("active");
+    }
+
+    function showPage(which) {
+      pageDashboard.style.display = "none";
+      pageTransactions.style.display = "none";
+      pageAnalytics.style.display = "none";
+      pageHistory.style.display = "none";
+      pageSettings.style.display = "none";
+      pageHelp.style.display = "none";
+
+      if (which === "dashboard") {
+        pageDashboard.style.display = "block";
+        setActive(navDashboard);
+        renderCurrentDashboard();
+      }
+      if (which === "transactions") {
+        pageTransactions.style.display = "block";
+        setActive(navTransactions);
+        renderAllTransactions(transactions);
+      }
+      if (which === "analytics") {
+        pageAnalytics.style.display = "block";
+        setActive(navAnalytics);
+        renderCurrentAnalytics();
+      }
+      if (which === "history") {
+        pageHistory.style.display = "block";
+        setActive(navHistory);
+        applyHistoryFilters();
+      }
+      if (which === "settings") {
+        pageSettings.style.display = "block";
+        setActive(navSettings);
+        loadSettingsUI();
+      }
+      if (which === "help") {
+        pageHelp.style.display = "block";
+        setActive(navHelp);
+      }
+    }
+
+    navDashboard.addEventListener("click", (e) => { e.preventDefault(); showPage("dashboard"); });
+    navTransactions.addEventListener("click", (e) => { e.preventDefault(); showPage("transactions"); });
+    navAnalytics.addEventListener("click", (e) => { e.preventDefault(); showPage("analytics"); });
+    navHistory.addEventListener("click", (e) => { e.preventDefault(); showPage("history"); });
+    navSettings.addEventListener("click", (e) => { e.preventDefault(); showPage("settings"); });
+    navHelp.addEventListener("click", (e) => { e.preventDefault(); showPage("help"); });
+
+    document.getElementById("seeAllBtn")?.addEventListener("click", () => showPage("transactions"));
+
+    // ====================
+    // RANGE SELECT (Dashboard)
+    // ====================
+    const rangeSelectDashboard = document.getElementById("rangeSelectDashboard");
+
+    function renderCurrentDashboard() {
+      const filtered = filterByLastDays(transactions, rangeSelectDashboard?.value || settings.defaultRange || "30");
+      renderStats(filtered);
+      renderLatestTable(filtered);
+      renderDashboardCharts(filtered);
+    }
+
+    rangeSelectDashboard?.addEventListener("change", renderCurrentDashboard);
+
+    // ====================
+    // QUICK ADD
+    // ====================
+    const quickForm = document.getElementById("quickForm");
+    const typeEl = document.getElementById("type");
+    const amountEl = document.getElementById("amount");
+    const categoryEl = document.getElementById("category");
+    const dateEl = document.getElementById("date");
+
+    quickForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const type = typeEl.value;
+      const amount = Number(amountEl.value);
+      const title = categoryEl.value.trim();
+      const date = dateEl.value;
+
+      if (!title) return alert("Please enter a Category/Title.");
+      if (!date) return alert("Please pick a Date.");
+      if (!Number.isFinite(amount) || amount <= 0) return alert("Please enter a valid Amount > 0.");
+
+      const newTx = { title, date, type, amount };
+      transactions.unshift(newTx);
+      saveTransactions();
+
+      if (pageDashboard.style.display !== "none") renderCurrentDashboard();
+      if (pageTransactions.style.display !== "none") renderAllTransactions(transactions);
+      if (pageAnalytics.style.display !== "none") renderCurrentAnalytics();
+
+      amountEl.value = "";
+      categoryEl.value = "";
+    });
+
+    // ====================
+    // THEME (FIXED + SYNCED)
+    // ====================
+    const themeBtn = document.getElementById("themeToggle");
+
+    function setThemeExplicit(mode) {
+      document.body.classList.toggle("dark", mode === "dark");
+      localStorage.setItem(STORAGE_THEME, mode);
+      themeBtn.textContent = mode === "dark" ? "☀️" : "🌓";
+    }
+
+    function syncSettingsThemeUI() {
+      const setDarkMode = document.getElementById("setDarkMode");
+      const setSystemTheme = document.getElementById("setSystemTheme");
+      if (!setDarkMode || !setSystemTheme) return;
+      setSystemTheme.checked = !!settings.useSystemTheme;
+      setDarkMode.checked = document.body.classList.contains("dark");
+      setDarkMode.disabled = setSystemTheme.checked;
+    }
+
+    function applyThemeFromSettings() {
+      if (settings.useSystemTheme) {
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        setThemeExplicit(prefersDark ? "dark" : "light");
+      } else {
+        const savedTheme = localStorage.getItem(STORAGE_THEME) || "light";
+        setThemeExplicit(savedTheme);
+      }
+      syncSettingsThemeUI();
+    }
+
+    // Load initial theme
+    applyThemeFromSettings();
+
+    // Top-right button toggles MANUAL theme and turns off system mode
+    themeBtn.addEventListener("click", () => {
+      if (settings.useSystemTheme) {
+        settings.useSystemTheme = false;
+        localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+      }
+      const isDarkNow = document.body.classList.contains("dark");
+      setThemeExplicit(isDarkNow ? "light" : "dark");
+
+      // refresh charts so ticks/grid stay readable
+      if (pageDashboard.style.display !== "none") renderCurrentDashboard();
+      if (pageAnalytics.style.display !== "none") renderCurrentAnalytics();
+      syncSettingsThemeUI();
+    });
+
+    // ====================
+    // SETTINGS UI LOGIC
+    // ====================
+    const setDarkMode = document.getElementById("setDarkMode");
+    const setSystemTheme = document.getElementById("setSystemTheme");
+    const setCurrency = document.getElementById("setCurrency");
+    const setWeekStart = document.getElementById("setWeekStart");
+    const setDefaultRange = document.getElementById("setDefaultRange");
+    const setMonthlyGoal = document.getElementById("setMonthlyGoal");
+    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+    const resetSettingsBtn = document.getElementById("resetSettingsBtn");
+    const settingsMsg = document.getElementById("settingsMsg");
+
+    const exportJsonBtn = document.getElementById("exportJsonBtn");
+    const importJsonInput = document.getElementById("importJsonInput");
+    const resetDataBtn = document.getElementById("resetDataBtn");
+
+    function loadSettingsUI() {
+      syncSettingsThemeUI();
+      setCurrency.value = settings.currency || "USD";
+      setWeekStart.value = settings.weekStart || "sunday";
+      setDefaultRange.value = settings.defaultRange || "30";
+      setMonthlyGoal.value = settings.monthlyGoal || "";
+      settingsMsg.textContent = "";
+    }
+
+    setSystemTheme?.addEventListener("change", () => {
+      if (!setDarkMode) return;
+      setDarkMode.disabled = setSystemTheme.checked;
+    });
+
+    saveSettingsBtn.addEventListener("click", () => {
+      settings.useSystemTheme = setSystemTheme.checked;
+      settings.currency = setCurrency.value;
+      settings.weekStart = setWeekStart.value;
+      settings.defaultRange = setDefaultRange.value;
+      settings.monthlyGoal = setMonthlyGoal.value;
+
+      localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+
+      if (!settings.useSystemTheme) {
+        setThemeExplicit(setDarkMode.checked ? "dark" : "light");
+      } else {
+        applyThemeFromSettings();
+      }
+
+      settingsMsg.textContent = "Settings saved!";
+      renderCurrentDashboard();
+      if (pageAnalytics.style.display !== "none") renderCurrentAnalytics();
+    });
+
+    resetSettingsBtn.addEventListener("click", () => {
+      settings = { ...defaultSettings };
+      localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+      localStorage.setItem(STORAGE_THEME, "light");
+      applyThemeFromSettings();
+      loadSettingsUI();
+      settingsMsg.textContent = "Settings reset to default.";
+      renderCurrentDashboard();
+      if (pageAnalytics.style.display !== "none") renderCurrentAnalytics();
+    });
+
+    // Export JSON
+    exportJsonBtn.addEventListener("click", () => {
+      const payload = {
+        transactions,
+        settings,
+        theme: localStorage.getItem(STORAGE_THEME) || "light",
+        exportedAt: new Date().toISOString(),
+      };
+
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "budget-tracker-backup.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+    });
+
+    // Import JSON
+    importJsonInput.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        if (Array.isArray(data.transactions)) {
+          transactions = data.transactions;
+          localStorage.setItem(STORAGE_TX, JSON.stringify(transactions));
+        }
+        if (data.settings && typeof data.settings === "object") {
+          settings = { ...defaultSettings, ...data.settings };
+          localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+        }
+        if (data.theme) {
+          localStorage.setItem(STORAGE_THEME, data.theme);
+        }
+
+        applyThemeFromSettings();
+        renderCurrentDashboard();
+        if (pageAnalytics.style.display !== "none") renderCurrentAnalytics();
+        settingsMsg.textContent = "Import successful!";
+      } catch (err) {
+        console.error(err);
+        settingsMsg.textContent = "Import failed. Invalid JSON file.";
+      } finally {
+        importJsonInput.value = "";
+      }
+    });
+
+    // Reset all data
+    resetDataBtn.addEventListener("click", () => {
+      const ok = confirm("This will erase all transactions and settings. Continue?");
+      if (!ok) return;
+
+      localStorage.removeItem(STORAGE_TX);
+      localStorage.removeItem(STORAGE_SETTINGS);
+      localStorage.removeItem(STORAGE_THEME);
+
+      transactions = demo;
+      localStorage.setItem(STORAGE_TX, JSON.stringify(transactions));
+      settings = { ...defaultSettings };
+      localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+
+      applyThemeFromSettings();
+      renderCurrentDashboard();
+      if (pageAnalytics.style.display !== "none") renderCurrentAnalytics();
+      loadSettingsUI();
+      settingsMsg.textContent = "All data reset.";
+    });
+
+    // ====================
+    // INITIAL LOAD
+    // ====================
+    renderCurrentDashboard();
+    showPage("dashboard");
+  </script>
+</body>
+</html>
