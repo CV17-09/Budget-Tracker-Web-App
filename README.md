@@ -1,5 +1,5 @@
 # Budget Tracker Web App
-01/12/2026 - 02/12/2026
+01/12/2026 - 02/13/2026
 
 A JavaScript-based web application that helps users manage income and expenses.
 Features secure authentication, dynamic dashboards, and interactive financial visualizations.
