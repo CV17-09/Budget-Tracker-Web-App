@@ -1,5 +1,4 @@
 # Budget Tracker Web App
-Front-end
 note: soon more updates and features 
 
 A JavaScript-based web application that helps users manage income and expenses.
